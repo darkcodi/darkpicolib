@@ -4,40 +4,23 @@ version = "0.1.0"
 edition = "2024"
 
 [dependencies]
-cortex-m-rt = "0.7"
 cyw43 = { version = "0.6.0", features = ["defmt", "firmware-logs"] }
 cyw43-pio = { version = "0.9.0", features = ["defmt"] }
 defmt = "1.0"
-defmt-rtt = "1.0"
-embassy-embedded-hal = { git = "https://github.com/darkcodi/embassy", branch = "usb-asynch-v4", features = ["defmt"] }
 embassy-executor = { git = "https://github.com/darkcodi/embassy", branch = "usb-asynch-v4", features = ["arch-cortex-m", "executor-thread", "executor-interrupt", "defmt"] }
-embassy-futures = { git = "https://github.com/darkcodi/embassy", branch = "usb-asynch-v4", features = ["defmt"] }
 embassy-net = { git = "https://github.com/darkcodi/embassy", branch = "usb-asynch-v4", features = ["defmt", "icmp", "tcp", "udp", "raw", "dhcpv4", "medium-ethernet", "dns", "proto-ipv4", "multicast"] }
 embassy-rp = { git = "https://github.com/darkcodi/embassy", branch = "usb-asynch-v4", features = ["defmt", "unstable-pac", "time-driver", "critical-section-impl", "rp2040"] }
-embassy-sync = { git = "https://github.com/darkcodi/embassy", branch = "usb-asynch-v4", features = ["defmt"] }
 embassy-time = { git = "https://github.com/darkcodi/embassy", branch = "usb-asynch-v4", features = ["defmt", "defmt-timestamp-uptime"] }
 embassy-usb = { git = "https://github.com/darkcodi/embassy", branch = "usb-asynch-v4", features = ["defmt"] }
-embassy-usb-driver = { git = "https://github.com/darkcodi/embassy", branch = "usb-asynch-v4", features = ["defmt"] }
 embedded-hal = "1.0"
-embedded-hal-async = "1.0"
-embedded-io-async = { version = "0.7.0", features = ["defmt"] }
 fixed = "1.29"
 heapless = { version = "0.9", features = ["defmt", "serde"] }
 i2c-character-display = { version = "0.5", features = ["defmt"] }
 libm = "0.2"
-nanofish = { git = "https://github.com/darkcodi/nanofish", rev = "bf159d1f560fa9a49412565b82e5b0121b5b9357", features = ["tls"] }
-picobroker = { version = "0.1.1" }
-panic-probe = { version = "1.0", features = ["print-defmt"] }
 portable-atomic = { version = "1.5", features = ["critical-section"] }
-serde = { version = "1.0.203", default-features = false, features = ["derive"] }
-
-# UART protocol stack: serialization, framing, CRC
-postcard = { version = "1.0", default-features = false, features = ["heapless"] }
-crc = "3.2"
 static_cell = "2.1"
 thiserror = { version = "2.0", default-features = false }
 usbd-hid = "0.9"
-pcobs = "1.0"
 
 [patch.crates-io]
 embassy-embedded-hal = { git = "https://github.com/darkcodi/embassy", branch = "usb-asynch-v4" }
