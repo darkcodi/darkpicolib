@@ -14,11 +14,11 @@ bench = false
 cyw43 = { version = "0.6.0", features = ["defmt", "firmware-logs"] }
 cyw43-pio = { version = "0.9.0", features = ["defmt"] }
 defmt = "1.0"
-embassy-executor = { git = "https://github.com/darkcodi/embassy", branch = "usb-asynch-v4", features = ["arch-cortex-m", "executor-thread", "executor-interrupt", "defmt"] }
-embassy-net = { git = "https://github.com/darkcodi/embassy", branch = "usb-asynch-v4", features = ["defmt", "icmp", "tcp", "udp", "raw", "dhcpv4", "medium-ethernet", "dns", "proto-ipv4", "multicast"] }
-embassy-rp = { git = "https://github.com/darkcodi/embassy", branch = "usb-asynch-v4", features = ["defmt", "unstable-pac", "time-driver", "critical-section-impl", "rp2040"] }
-embassy-time = { git = "https://github.com/darkcodi/embassy", branch = "usb-asynch-v4", features = ["defmt", "defmt-timestamp-uptime"] }
-embassy-usb = { git = "https://github.com/darkcodi/embassy", branch = "usb-asynch-v4", features = ["defmt"] }
+embassy-executor = { git = "https://github.com/darkcodi/embassy", rev = "760eb3b8d4725432588d4ee54ebaaa10f012a564", features = ["arch-cortex-m", "executor-thread", "executor-interrupt", "defmt"] }
+embassy-net = { git = "https://github.com/darkcodi/embassy", rev = "760eb3b8d4725432588d4ee54ebaaa10f012a564", features = ["defmt", "icmp", "tcp", "udp", "raw", "dhcpv4", "medium-ethernet", "dns", "proto-ipv4", "multicast"] }
+embassy-rp = { git = "https://github.com/darkcodi/embassy", rev = "760eb3b8d4725432588d4ee54ebaaa10f012a564", features = ["defmt", "unstable-pac", "time-driver", "critical-section-impl", "rp2040"] }
+embassy-time = { git = "https://github.com/darkcodi/embassy", rev = "760eb3b8d4725432588d4ee54ebaaa10f012a564", features = ["defmt", "defmt-timestamp-uptime"] }
+embassy-usb = { git = "https://github.com/darkcodi/embassy", rev = "760eb3b8d4725432588d4ee54ebaaa10f012a564", features = ["defmt"] }
 embedded-hal = "1.0"
 fixed = "1.29"
 heapless = { version = "0.9", features = ["defmt", "serde"] }
@@ -30,14 +30,14 @@ thiserror = { version = "2.0", default-features = false }
 usbd-hid = "0.9"
 
 [patch.crates-io]
-embassy-embedded-hal = { git = "https://github.com/darkcodi/embassy", branch = "usb-asynch-v4" }
-embassy-executor = { git = "https://github.com/darkcodi/embassy", branch = "usb-asynch-v4" }
-embassy-futures = { git = "https://github.com/darkcodi/embassy", branch = "usb-asynch-v4" }
-embassy-net = { git = "https://github.com/darkcodi/embassy", branch = "usb-asynch-v4" }
-embassy-net-driver = { git = "https://github.com/darkcodi/embassy", branch = "usb-asynch-v4" }
-embassy-net-driver-channel = { git = "https://github.com/darkcodi/embassy", branch = "usb-asynch-v4" }
-embassy-rp = { git = "https://github.com/darkcodi/embassy", branch = "usb-asynch-v4" }
-embassy-sync = { git = "https://github.com/darkcodi/embassy", branch = "usb-asynch-v4" }
-embassy-time = { git = "https://github.com/darkcodi/embassy", branch = "usb-asynch-v4" }
-embassy-usb = { git = "https://github.com/darkcodi/embassy", branch = "usb-asynch-v4" }
-embassy-usb-driver = { git = "https://github.com/darkcodi/embassy", branch = "usb-asynch-v4" }
+embassy-embedded-hal = { git = "https://github.com/darkcodi/embassy", rev = "760eb3b8d4725432588d4ee54ebaaa10f012a564" }
+embassy-executor = { git = "https://github.com/darkcodi/embassy", rev = "760eb3b8d4725432588d4ee54ebaaa10f012a564" }
+embassy-futures = { git = "https://github.com/darkcodi/embassy", rev = "760eb3b8d4725432588d4ee54ebaaa10f012a564" }
+embassy-net = { git = "https://github.com/darkcodi/embassy", rev = "760eb3b8d4725432588d4ee54ebaaa10f012a564" }
+embassy-net-driver = { git = "https://github.com/darkcodi/embassy", rev = "760eb3b8d4725432588d4ee54ebaaa10f012a564" }
+embassy-net-driver-channel = { git = "https://github.com/darkcodi/embassy", rev = "760eb3b8d4725432588d4ee54ebaaa10f012a564" }
+embassy-rp = { git = "https://github.com/darkcodi/embassy", rev = "760eb3b8d4725432588d4ee54ebaaa10f012a564" }
+embassy-sync = { git = "https://github.com/darkcodi/embassy", rev = "760eb3b8d4725432588d4ee54ebaaa10f012a564" }
+embassy-time = { git = "https://github.com/darkcodi/embassy", rev = "760eb3b8d4725432588d4ee54ebaaa10f012a564" }
+embassy-usb = { git = "https://github.com/darkcodi/embassy", rev = "760eb3b8d4725432588d4ee54ebaaa10f012a564" }
+embassy-usb-driver = { git = "https://github.com/darkcodi/embassy", rev = "760eb3b8d4725432588d4ee54ebaaa10f012a564" }
