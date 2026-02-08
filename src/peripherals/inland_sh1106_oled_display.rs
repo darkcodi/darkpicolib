@@ -1,6 +1,6 @@
 use core::convert::Infallible;
 
-use embassy_rp::gpio::Output;
+use embassy_rp::gpio::{Level, Output};
 use embassy_rp::spi::{self, Spi};
 use embassy_time::Timer;
 use embedded_graphics::mono_font::{ascii::FONT_4X6, MonoTextStyle};
@@ -167,5 +167,38 @@ fn map_sh1106_error<CommE, PinE>(err: sh1106::Error<CommE, PinE>) -> InlandSh110
     match err {
         sh1106::Error::Comm(_) => InlandSh1106OledError::Communication,
         sh1106::Error::Pin(_) => InlandSh1106OledError::Pin,
+    }
+}
+
+pub struct DefaultInlandSh1106Pins {
+    pub cs: embassy_rp::Peri<'static, embassy_rp::peripherals::PIN_17>,
+    pub dc: embassy_rp::Peri<'static, embassy_rp::peripherals::PIN_20>,
+    pub rst: embassy_rp::Peri<'static, embassy_rp::peripherals::PIN_21>,
+    pub clk: embassy_rp::Peri<'static, embassy_rp::peripherals::PIN_18>,
+    pub mosi: embassy_rp::Peri<'static, embassy_rp::peripherals::PIN_19>,
+    pub spi: embassy_rp::Peri<'static, embassy_rp::peripherals::SPI0>,
+    pub dma: embassy_rp::Peri<'static, embassy_rp::peripherals::DMA_CH0>,
+}
+
+impl<'d> InlandSh1106OledDisplay<'d, embassy_rp::peripherals::SPI0, spi::Async> {
+    pub async fn from_default_pins(pins: DefaultInlandSh1106Pins) -> Self {
+        let cs = Output::new(pins.cs, Level::High);
+        let dc = Output::new(pins.dc, Level::Low);
+        let mut rst = Output::new(pins.rst, Level::High);
+
+        rst.set_low();
+        Timer::after_millis(10).await;
+        rst.set_high();
+        Timer::after_millis(10).await;
+
+        let mut cfg = spi::Config::default();
+        cfg.frequency = 10_000_000;
+        cfg.phase = spi::Phase::CaptureOnFirstTransition; // SPI mode 0
+        cfg.polarity = spi::Polarity::IdleLow;
+
+        let spi = Spi::new_txonly(pins.spi, pins.clk, pins.mosi, pins.dma, cfg);
+
+        let display = Self::new(spi, dc, cs);
+        display
     }
 }
