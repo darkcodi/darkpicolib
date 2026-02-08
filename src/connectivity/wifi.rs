@@ -1,4 +1,4 @@
-use cyw43_pio::{PioSpi, DEFAULT_CLOCK_DIVIDER};
+use cyw43_pio::{DEFAULT_CLOCK_DIVIDER, PioSpi};
 use defmt::warn;
 use embassy_net::{Stack, StackResources};
 use embassy_rp::gpio::Output;

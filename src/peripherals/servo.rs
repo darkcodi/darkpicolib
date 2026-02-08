@@ -4,8 +4,8 @@
 use core::cmp::{max, min};
 use embassy_rp::pwm::Pwm;
 use embedded_hal::pwm::SetDutyCycle;
-use fixed::types::extra::U4;
 use fixed::FixedU16;
+use fixed::types::extra::U4;
 
 /// Servo signal specification (all in microseconds / degrees).
 #[derive(Copy, Clone, Debug)]

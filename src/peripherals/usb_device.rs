@@ -21,8 +21,8 @@
 
 use core::sync::atomic::{AtomicBool, Ordering};
 use defmt::info;
-use embassy_executor::task;
 use embassy_executor::Spawner;
+use embassy_executor::task;
 use embassy_rp::interrupt::typelevel::Binding;
 use embassy_rp::peripherals::USB;
 use embassy_rp::usb::Driver;
@@ -234,9 +234,9 @@ impl UsbHidDevice {
     ) -> Result<Self, UsbHidError>
     where
         I: Binding<
-            <USB as embassy_rp::usb::Instance>::Interrupt,
-            embassy_rp::usb::InterruptHandler<USB>,
-        >,
+                <USB as embassy_rp::usb::Instance>::Interrupt,
+                embassy_rp::usb::InterruptHandler<USB>,
+            >,
     {
         info!("Initializing USB HID device...");
 
@@ -340,9 +340,9 @@ impl UsbHidDevice {
     ) -> Result<Self, UsbHidError>
     where
         I: Binding<
-            <USB as embassy_rp::usb::Instance>::Interrupt,
-            embassy_rp::usb::InterruptHandler<USB>,
-        >,
+                <USB as embassy_rp::usb::Instance>::Interrupt,
+                embassy_rp::usb::InterruptHandler<USB>,
+            >,
     {
         Self::new(
             usb,
@@ -385,9 +385,9 @@ impl UsbHidDevice {
     ) -> Result<Self, UsbHidError>
     where
         I: Binding<
-            <USB as embassy_rp::usb::Instance>::Interrupt,
-            embassy_rp::usb::InterruptHandler<USB>,
-        >,
+                <USB as embassy_rp::usb::Instance>::Interrupt,
+                embassy_rp::usb::InterruptHandler<USB>,
+            >,
     {
         Self::new(
             usb,

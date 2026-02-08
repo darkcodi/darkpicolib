@@ -3,11 +3,11 @@ use core::convert::Infallible;
 use embassy_rp::gpio::Output;
 use embassy_rp::spi::{self, Spi};
 use embassy_time::Timer;
-use embedded_graphics::mono_font::{ascii::FONT_4X6, MonoTextStyle};
+use embedded_graphics::mono_font::{MonoTextStyle, ascii::FONT_4X6};
 use embedded_graphics::pixelcolor::BinaryColor;
 use embedded_graphics::prelude::*;
 use embedded_graphics::text::Text;
-use sh1106::{prelude::*, Builder};
+use sh1106::{Builder, prelude::*};
 
 pub const INLAND_SH1106_WIDTH: u8 = 128;
 pub const INLAND_SH1106_HEIGHT: u8 = 64;
@@ -158,7 +158,9 @@ where
         self.flush()
     }
 
-    pub fn display_mut(&mut self) -> &mut GraphicsMode<SpiInterface<Spi<'d, T, M>, Output<'d>, Output<'d>>> {
+    pub fn display_mut(
+        &mut self,
+    ) -> &mut GraphicsMode<SpiInterface<Spi<'d, T, M>, Output<'d>, Output<'d>>> {
         &mut self.display
     }
 }

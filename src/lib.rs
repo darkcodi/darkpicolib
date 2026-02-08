@@ -1,9 +1,9 @@
 #![no_std]
 
 mod connectivity;
-mod peripherals;
 mod heapless;
+mod peripherals;
 
 pub use connectivity::*;
-pub use peripherals::*;
 pub use heapless::*;
+pub use peripherals::*;
