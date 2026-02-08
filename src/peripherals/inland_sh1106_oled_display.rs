@@ -2,7 +2,7 @@ use core::convert::Infallible;
 
 use embassy_rp::gpio::Output;
 use embassy_rp::spi::{self, Spi};
-use embassy_time::{Duration, Instant, Timer};
+use embassy_time::Timer;
 use embedded_graphics::mono_font::{MonoTextStyle, ascii::FONT_4X6};
 use embedded_graphics::pixelcolor::BinaryColor;
 use embedded_graphics::prelude::*;
@@ -15,7 +15,6 @@ pub const INLAND_SH1106_HEIGHT: u8 = 64;
 pub const INLAND_SH1106_TEXT_LINE_HEIGHT: i32 = 6;
 pub const INLAND_SH1106_MAX_TEXT_LINES: usize = 10;
 pub const INLAND_SH1106_MAX_CHARS_PER_LINE: usize = 32;
-pub const INLAND_SH1106_LOGS_REFRESH_INTERVAL_MS: u64 = 75;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, defmt::Format, thiserror::Error)]
 pub enum InlandSh1106OledError {
@@ -180,11 +179,7 @@ where
     M: spi::Mode,
 {
     display: InlandSh1106OledDisplay<'d, T, M>,
-    logs: [HeaplessString<32>; INLAND_SH1106_MAX_TEXT_LINES],
-    head: usize,
-    count: usize,
-    dirty: bool,
-    last_refresh: Option<Instant>,
+    logs: [HeaplessString<32>; 10],
 }
 
 impl<'d, T, M> LogsDisplay<'d, T, M>
@@ -193,69 +188,35 @@ where
     M: spi::Mode,
 {
     pub fn new(display: InlandSh1106OledDisplay<'d, T, M>) -> Self {
-        let logs = [const { HeaplessString::new() }; INLAND_SH1106_MAX_TEXT_LINES];
-        Self {
-            display,
-            logs,
-            head: 0,
-            count: 0,
-            dirty: false,
-            last_refresh: None,
-        }
+        let logs = [const { HeaplessString::new() }; 10];
+        Self { display, logs }
     }
 
     pub fn log(&mut self, msg: &str) {
-        self.push_log(msg);
-        self.dirty = true;
-        self.refresh_if_due(false);
-    }
-
-    pub fn flush(&mut self) {
-        self.refresh_if_due(true);
-    }
-
-    fn push_log(&mut self, msg: &str) {
-        let insert_at = if self.count < INLAND_SH1106_MAX_TEXT_LINES {
-            let idx = (self.head + self.count) % INLAND_SH1106_MAX_TEXT_LINES;
-            self.count += 1;
-            idx
-        } else {
-            let idx = self.head;
-            self.head = (self.head + 1) % INLAND_SH1106_MAX_TEXT_LINES;
-            idx
-        };
-
-        self.logs[insert_at].clear();
-        for c in msg.chars().take(INLAND_SH1106_MAX_CHARS_PER_LINE) {
-            let _ = self.logs[insert_at].push(c);
+        // Shift existing logs up
+        for i in 0..(self.logs.len() - 1) {
+            self.logs[i] = self.logs[i + 1].clone();
         }
-    }
-
-    fn refresh_if_due(&mut self, force: bool) {
-        if !self.dirty {
-            return;
+        // Add new log at the bottom
+        let mut last_log_str: HeaplessString<32> = HeaplessString::new();
+        for c in msg.chars().take(32) {
+            let _ = last_log_str.push(c); // Truncate if message is too long
         }
+        self.logs[9] = last_log_str;
 
-        let now = Instant::now();
-        if !force {
-            if let Some(last_refresh) = self.last_refresh {
-                let next_refresh = last_refresh + Duration::from_millis(INLAND_SH1106_LOGS_REFRESH_INTERVAL_MS);
-                if now < next_refresh {
-                    return;
-                }
-            }
-        }
-
-        let mut lines: [&str; INLAND_SH1106_MAX_TEXT_LINES] = [""; INLAND_SH1106_MAX_TEXT_LINES];
-        let pad = INLAND_SH1106_MAX_TEXT_LINES - self.count;
-        for i in 0..self.count {
-            let idx = (self.head + i) % INLAND_SH1106_MAX_TEXT_LINES;
-            lines[pad + i] = self.logs[idx].as_str();
-        }
-
-        if self.display.display_str_arr(&lines).is_ok() {
-            self.dirty = false;
-            self.last_refresh = Some(now);
-        }
+        // Display logs on OLED
+        let logs_arr: [&str; 10] = [
+            self.logs[0].as_str(),
+            self.logs[1].as_str(),
+            self.logs[2].as_str(),
+            self.logs[3].as_str(),
+            self.logs[4].as_str(),
+            self.logs[5].as_str(),
+            self.logs[6].as_str(),
+            self.logs[7].as_str(),
+            self.logs[8].as_str(),
+            self.logs[9].as_str(),
+        ];
+        let _ = self.display.display_str_arr(&logs_arr); // Ignore display errors
     }
 }
