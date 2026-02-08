@@ -372,6 +372,112 @@ impl<T: Default, const N: usize> Iterator for HeaplessVecIntoIterator<T, N> {
     }
 }
 
+#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
+pub struct HeaplessQueue<T, const N: usize> {
+    length: u16,
+    head: u16,
+    tail: u16,
+    data: [T; N],
+}
+
+impl<T: Default, const N: usize> Default for HeaplessQueue<T, N> {
+    fn default() -> Self {
+        Self {
+            length: 0,
+            head: 0,
+            tail: 0,
+            data: core::array::from_fn(|_| T::default()),
+        }
+    }
+}
+
+impl<T: Default, const N: usize> HeaplessQueue<T, N> {
+    pub fn new() -> Self {
+        Self::default()
+    }
+}
+
+impl<T, const N: usize> HeaplessQueue<T, N> {
+    pub fn len(&self) -> usize {
+        self.length as usize
+    }
+
+    pub fn is_empty(&self) -> bool {
+        self.length == 0
+    }
+
+    pub fn is_full(&self) -> bool {
+        self.length as usize == N
+    }
+
+    pub fn capacity(&self) -> usize {
+        N
+    }
+
+    pub fn clear(&mut self) {
+        self.length = 0;
+        self.head = 0;
+        self.tail = 0;
+    }
+
+    pub fn enqueue(&mut self, item: T) -> Result<(), PushError> {
+        if self.is_full() {
+            return Err(PushError);
+        }
+
+        self.data[self.tail as usize] = item;
+        self.tail = if (self.tail as usize) + 1 == N {
+            0
+        } else {
+            self.tail + 1
+        };
+        self.length += 1;
+
+        Ok(())
+    }
+
+    pub fn dequeue(&mut self) -> Option<T>
+    where
+        T: Default,
+    {
+        if self.is_empty() {
+            return None;
+        }
+
+        let item = core::mem::take(&mut self.data[self.head as usize]);
+        self.head = if (self.head as usize) + 1 == N {
+            0
+        } else {
+            self.head + 1
+        };
+        self.length -= 1;
+
+        Some(item)
+    }
+
+    pub fn front(&self) -> Option<&T> {
+        if self.is_empty() {
+            None
+        } else {
+            Some(&self.data[self.head as usize])
+        }
+    }
+
+    pub fn back(&self) -> Option<&T> {
+        if self.is_empty() {
+            return None;
+        }
+
+        let last_idx = if self.tail == 0 {
+            N - 1
+        } else {
+            self.tail as usize - 1
+        };
+
+        Some(&self.data[last_idx])
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -520,5 +626,60 @@ mod tests {
 
         assert_eq!(s.as_str(), "hello");
         assert_eq!(s.len(), 5);
+    }
+
+    #[test]
+    fn test_queue_fifo_and_capacity() {
+        let mut queue: HeaplessQueue<u8, 3> = HeaplessQueue::new();
+        assert!(queue.is_empty());
+        assert_eq!(queue.capacity(), 3);
+        assert_eq!(queue.front(), None);
+        assert_eq!(queue.back(), None);
+
+        assert!(queue.enqueue(1).is_ok());
+        assert!(queue.enqueue(2).is_ok());
+        assert!(queue.enqueue(3).is_ok());
+        assert!(queue.is_full());
+        assert_eq!(queue.front(), Some(&1));
+        assert_eq!(queue.back(), Some(&3));
+
+        assert_eq!(queue.enqueue(4), Err(PushError));
+
+        assert_eq!(queue.dequeue(), Some(1));
+        assert_eq!(queue.dequeue(), Some(2));
+        assert_eq!(queue.dequeue(), Some(3));
+        assert_eq!(queue.dequeue(), None);
+    }
+
+    #[test]
+    fn test_queue_wraparound() {
+        let mut queue: HeaplessQueue<u8, 3> = HeaplessQueue::new();
+
+        assert!(queue.enqueue(1).is_ok());
+        assert!(queue.enqueue(2).is_ok());
+        assert!(queue.enqueue(3).is_ok());
+        assert_eq!(queue.dequeue(), Some(1));
+        assert_eq!(queue.dequeue(), Some(2));
+
+        assert!(queue.enqueue(4).is_ok());
+        assert!(queue.enqueue(5).is_ok());
+        assert!(queue.is_full());
+        assert_eq!(queue.front(), Some(&3));
+        assert_eq!(queue.back(), Some(&5));
+
+        assert_eq!(queue.dequeue(), Some(3));
+        assert_eq!(queue.dequeue(), Some(4));
+        assert_eq!(queue.dequeue(), Some(5));
+        assert!(queue.is_empty());
+    }
+
+    #[test]
+    fn test_queue_zero_capacity() {
+        let mut queue: HeaplessQueue<u8, 0> = HeaplessQueue::new();
+        assert!(queue.is_empty());
+        assert!(queue.is_full());
+        assert_eq!(queue.capacity(), 0);
+        assert_eq!(queue.enqueue(1), Err(PushError));
+        assert_eq!(queue.dequeue(), None);
     }
 }
