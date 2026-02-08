@@ -8,6 +8,7 @@ use embedded_graphics::pixelcolor::BinaryColor;
 use embedded_graphics::prelude::*;
 use embedded_graphics::text::Text;
 use sh1106::{Builder, prelude::*};
+use crate::HeaplessString;
 
 pub const INLAND_SH1106_WIDTH: u8 = 128;
 pub const INLAND_SH1106_HEIGHT: u8 = 64;
@@ -169,5 +170,53 @@ fn map_sh1106_error<CommE, PinE>(err: sh1106::Error<CommE, PinE>) -> InlandSh110
     match err {
         sh1106::Error::Comm(_) => InlandSh1106OledError::Communication,
         sh1106::Error::Pin(_) => InlandSh1106OledError::Pin,
+    }
+}
+
+pub struct LogsDisplay<'d, T, M>
+where
+    T: spi::Instance,
+    M: spi::Mode,
+{
+    display: InlandSh1106OledDisplay<'d, T, M>,
+    logs: [HeaplessString<32>; 10],
+}
+
+impl<'d, T, M> LogsDisplay<'d, T, M>
+where
+    T: spi::Instance,
+    M: spi::Mode,
+{
+    pub fn new(display: InlandSh1106OledDisplay<'d, T, M>) -> Self {
+        let logs = [const { HeaplessString::new() }; 10];
+        Self { display, logs }
+    }
+
+    pub fn log(&mut self, msg: &str) {
+        // Shift existing logs up
+        for i in 0..(self.logs.len() - 1) {
+            self.logs[i] = self.logs[i + 1].clone();
+        }
+        // Add new log at the bottom
+        let mut last_log_str: HeaplessString<32> = HeaplessString::new();
+        for c in msg.chars().take(32) {
+            let _ = last_log_str.push(c); // Truncate if message is too long
+        }
+        self.logs[9] = last_log_str;
+
+        // Display logs on OLED
+        let logs_arr: [&str; 10] = [
+            self.logs[0].as_str(),
+            self.logs[1].as_str(),
+            self.logs[2].as_str(),
+            self.logs[3].as_str(),
+            self.logs[4].as_str(),
+            self.logs[5].as_str(),
+            self.logs[6].as_str(),
+            self.logs[7].as_str(),
+            self.logs[8].as_str(),
+            self.logs[9].as_str(),
+        ];
+        let _ = self.display.display_str_arr(&logs_arr); // Ignore display errors
     }
 }
