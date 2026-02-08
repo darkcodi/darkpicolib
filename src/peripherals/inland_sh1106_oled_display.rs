@@ -127,6 +127,37 @@ where
         self.flush()
     }
 
+    pub fn display_str_arr(&mut self, lines: &[&str]) -> Result<(), InlandSh1106OledError> {
+        let line_count = lines.len();
+        if line_count > INLAND_SH1106_MAX_TEXT_LINES {
+            return Err(InlandSh1106OledError::TooManyLines {
+                actual_lines: line_count,
+                max_lines: INLAND_SH1106_MAX_TEXT_LINES,
+            });
+        }
+
+        for (line_index, line) in lines.iter().enumerate() {
+            let chars = line.chars().count();
+            if chars > INLAND_SH1106_MAX_CHARS_PER_LINE {
+                return Err(InlandSh1106OledError::LineTooLong {
+                    line_index,
+                    actual_chars: chars,
+                    max_chars: INLAND_SH1106_MAX_CHARS_PER_LINE,
+                });
+            }
+        }
+
+        self.display.clear();
+        let style = MonoTextStyle::new(&FONT_4X6, BinaryColor::On);
+
+        for (line_index, line) in lines.iter().enumerate() {
+            let y = ((line_index as i32) + 1) * INLAND_SH1106_TEXT_LINE_HEIGHT;
+            let _ = Text::new(line, Point::new(0, y), style).draw(&mut self.display);
+        }
+
+        self.flush()
+    }
+
     pub fn display_mut(&mut self) -> &mut GraphicsMode<SpiInterface<Spi<'d, T, M>, Output<'d>, Output<'d>>> {
         &mut self.display
     }
