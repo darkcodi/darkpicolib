@@ -20,11 +20,13 @@ embassy-rp = { git = "https://github.com/darkcodi/embassy", rev = "760eb3b8d4725
 embassy-time = { git = "https://github.com/darkcodi/embassy", rev = "760eb3b8d4725432588d4ee54ebaaa10f012a564", features = ["defmt", "defmt-timestamp-uptime"] }
 embassy-usb = { git = "https://github.com/darkcodi/embassy", rev = "760eb3b8d4725432588d4ee54ebaaa10f012a564", features = ["defmt"] }
 embedded-hal = "1.0"
+embedded-graphics = "0.8"
 fixed = "1.29"
 heapless = { version = "0.9", features = ["defmt", "serde"] }
 i2c-character-display = { version = "0.5", features = ["defmt"] }
 libm = "0.2"
 portable-atomic = { version = "1.5", features = ["critical-section"] }
+sh1106 = "0.5"
 static_cell = "2.1"
 thiserror = { version = "2.0", default-features = false }
 usbd-hid = "0.9"
